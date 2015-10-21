@@ -22,6 +22,7 @@ var RueQueue = function (params) {
   // this._regrets = 0;
   this.callback = params.callback;
   this.retryWait = params.retryWait || 5000;
+  this.verbose = params.verbose || false;
 
   this.push = function (val) {
     if (this.queue.length+1 > this.maxsize) {
@@ -30,9 +31,9 @@ var RueQueue = function (params) {
       if (typeof maybe_regret._regret !== 'undefined') {
         this.queue.pop(); // get rid of the oldest data
         maybe_regret._regret += 1;
-        this.queue.push(maybe_regret)
+        this.queue.push(maybe_regret);
       } else {
-        this.queue.push({_regret: 1})
+        this.queue.push({_regret: 1});
       }
     }
 
@@ -40,30 +41,48 @@ var RueQueue = function (params) {
     this.emit('drain');
   };
 
-  this.list = function (val) {
-    return this.queue;
+  this.on('error', function() {
+    this.resetDrainRetryTimer();
+  });
+
+  this.on('success', function() {
+    this.queue.pop();
+    this.emit('drain');
+  });
+
+  var me = this;
+  this.success = function(){
+    if (me.verbose) {
+      console.log("callback invoked success");
+    }
+    me.emit('success');
+  };
+
+  this.error = function(){
+    if (me.verbose) {
+      console.log("callback invoked error");
+    }
+    me.emit('error');
   };
 
   this._drainRunning = false;
   this.on('drain', function(){
-    console.log('called drain: ', this.queue);
-    if (this._drainRunning) {
+    if (this.queue.length === 0) {
+      // We stop trying to process messages
       return;
     }
 
-    this._drainRunning = true;
-    for (var i=this.queue.length-1; i > -1; i--) {
-      console.log("state:", i, "queue: ", this.queue);
-      try {
-        var entry = this.queue[i];
-        this.callback(entry);
-        this.queue.splice(i, 1);
-      } catch(e) {
+    var entry = this.queue[this.queue.length-1]; // peek
+    try {
+      this.callback(entry,this);
+    } catch(e) {
+      if (this.verbose) {
+        console.log("RueQueue(", this.name, ") callback died with: ", e, this.queue);
+      } else {
         console.log("RueQueue(", this.name, ") callback died with: ", e);
-        this.resetDrainRetryTimer();
       }
+      this.resetDrainRetryTimer();
     }
-    this._drainRunning = false;
   });
 
   this._drainRetryTimer = null;
@@ -78,6 +97,7 @@ var RueQueue = function (params) {
     }, this.retryWait);
   };
 };
+
 util.inherits(RueQueue, EventEmitter);
 
 module.exports = function(params) {

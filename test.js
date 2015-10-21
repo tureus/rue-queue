@@ -1,21 +1,26 @@
 var RueQueue = require("../rue-queue");
 
-var tryTimes = 3;
+var throwError = true;
 var rq = new RueQueue({
   name: "test-rqueue",
   maxsize: 2,
   retryWait: 1,
-  callback: function(value){
-    if (value === 9012 && tryTimes !== 0) {
-      tryTimes -= 1;
-      throw "SURPRISE!!! " + value;
+  verbose: true,
+  callback: function(value,queueHandle){
+    if (throwError) {
+      queueHandle.error();
+      return;
+      // throw "SURPRISE!!! " + value;
     }
-    console.log("going to drain: ", arguments);
+    console.log("going to drain: ", value);
+    queueHandle.success();
   }
 });
 
-rq._drainRunning = true;
-rq.push(1234);
-rq.push(5678);
-rq._drainRunning = false;
-rq.push(9012);
+rq.push(1);
+rq.push(2);
+rq.push(3);
+rq.push(4);
+rq.push(5);
+rq.push(6);
+throwError = false;
