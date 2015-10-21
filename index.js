@@ -14,29 +14,29 @@ var RegretfulQueue = function (params) {
     throw "must set callback function";
   } else if (typeof params.name !== 'string' || params.name.length === 0) {
     throw "must provide name";
-  } else if (typeof params.regretsCallback !== 'function') {
-    console.log("note, you can provide an optional regretsCallback");
   }
 
   this.name = params.name;
   this.queue = [];
   this.maxsize = params.maxsize;
-  this._regrets = 0;
+  // this._regrets = 0;
   this.callback = params.callback;
-  this.regretsCallback = params.regretsCallback;
 
   this.push = function (val) {
     if (this.queue.length+1 > this.maxsize) {
-      this._regrets += 1;
-      this.queue.pop(); // end of the array is the oldest data
+      // this._regrets += 1;
+      var maybe_regret = this.queue.pop(); // end of the array is the oldest data
+      if (typeof maybe_regret._regret !== 'undefined') {
+        this.queue.pop(); // get rid of the oldest data
+        maybe_regret._regret += 1;
+        this.queue.push(maybe_regret)
+      } else {
+        this.queue.push({_regret: 1})
+      }
     }
 
     this.queue.unshift(val);
     this.emit('drain');
-  };
-
-  this.regrets = function() {
-    return this._regrets;
   };
 
   this.list = function (val) {
@@ -90,9 +90,6 @@ var rq = new RegretfulQueue({
       throw "SURPRISE!!! " + value;
     }
     console.log("going to drain: ", arguments);
-  },
-  regretsCallback: function(regrets) {
-    console.log("I have", regrets, "regrets");
   }
 });
 
