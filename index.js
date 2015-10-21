@@ -41,6 +41,10 @@ var RueQueue = function (params) {
     this.emit('drain');
   };
 
+  this.length = function() {
+    return this.queue.length;
+  }
+
   this.on('error', function() {
     this.resetDrainRetryTimer();
   });
