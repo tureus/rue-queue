@@ -21,6 +21,7 @@ var RueQueue = function (params) {
   this.maxsize = params.maxsize;
   // this._regrets = 0;
   this.callback = params.callback;
+  this.retryWait = params.retryWait || 5000;
 
   this.push = function (val) {
     if (this.queue.length+1 > this.maxsize) {
@@ -65,7 +66,6 @@ var RueQueue = function (params) {
     this._drainRunning = false;
   });
 
-  this.resetTime = 5000;
   this._drainRetryTimer = null;
   this.resetDrainRetryTimer = function() {
     if (typeof this._drainRetryTimer !== 'undefined') {
@@ -75,29 +75,10 @@ var RueQueue = function (params) {
     var me = this;
     this._drainRetryTimer = setTimeout(function() {
       me.emit('drain');
-    }, this.resetTime);
+    }, this.retryWait);
   };
 };
 util.inherits(RueQueue, EventEmitter);
-
-var tryTimes = 3;
-var rq = new RueQueue({
-  name: "test-rqueue",
-  maxsize: 2,
-  callback: function(value){
-    if (value === 9012 && tryTimes !== 0) {
-      tryTimes -= 1;
-      throw "SURPRISE!!! " + value;
-    }
-    console.log("going to drain: ", arguments);
-  }
-});
-
-rq._drainRunning = true;
-rq.push(1234);
-rq.push(5678);
-rq._drainRunning = false;
-rq.push(9012);
 
 module.exports = function(params) {
   return new RueQueue(params);
