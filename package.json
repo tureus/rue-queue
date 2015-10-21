@@ -1,6 +1,6 @@
 {
-  "name": "regretful-queue",
-  "version": "0.0.1",
+  "name": "rue-queue",
+  "version": "0.0.2",
   "description": "A circular queue which regrets throwing away stale data",
   "main": "index.js",
   "scripts": {
@@ -8,7 +8,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/tureus/regretful-queue.git"
+    "url": "git+https://github.com/tureus/rue-queue.git"
   },
   "keywords": [
     "queue"
@@ -16,7 +16,7 @@
   "author": "Xavier Lange <xrlange@tureus.com>",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/tureus/regretful-queue/issues"
+    "url": "https://github.com/tureus/rue-queue/issues"
   },
-  "homepage": "https://github.com/tureus/regretful-queue#readme"
+  "homepage": "https://github.com/tureus/rue-queue#readme"
 }

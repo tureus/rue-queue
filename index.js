@@ -4,7 +4,7 @@
 var util = require('util');
 var EventEmitter = require('events');
 
-var RegretfulQueue = function (params) {
+var RueQueue = function (params) {
   EventEmitter.call(this);
   this.setMaxListeners(1);
 
@@ -58,7 +58,7 @@ var RegretfulQueue = function (params) {
         this.callback(entry);
         this.queue.splice(i, 1);
       } catch(e) {
-        console.log("RegretfulQueue(", this.name, ") callback died with: ", e);
+        console.log("RueQueue(", this.name, ") callback died with: ", e);
         this.resetDrainRetryTimer();
       }
     }
@@ -78,10 +78,10 @@ var RegretfulQueue = function (params) {
     }, this.resetTime);
   };
 };
-util.inherits(RegretfulQueue, EventEmitter);
+util.inherits(RueQueue, EventEmitter);
 
 var tryTimes = 3;
-var rq = new RegretfulQueue({
+var rq = new RueQueue({
   name: "test-rqueue",
   maxsize: 2,
   callback: function(value){
@@ -100,5 +100,5 @@ rq._drainRunning = false;
 rq.push(9012);
 
 module.exports = function(params) {
-  return new RegretfulQueue(params);
+  return new RueQueue(params);
 };
