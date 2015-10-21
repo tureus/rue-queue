@@ -38,7 +38,12 @@ var RueQueue = function (params) {
     }
 
     this.queue.unshift(val);
-    this.emit('drain');
+
+    if (this._drainRetryTimer !== null) {
+      // Do nothing. The timer will fire in the future and retry.
+    } else {
+      this.emit('drain');
+    }
   };
 
   this.length = function() {
