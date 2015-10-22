@@ -18,7 +18,7 @@ var rq = new RueQueue({
 });
 
 rq.push(1);
-rq.push(2);
+rq.pushNoDrain(2);
 rq.push(3);
 rq.push(4);
 rq.push(5);

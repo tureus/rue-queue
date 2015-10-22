@@ -34,7 +34,7 @@ var RueQueue = function (params) {
     console.log.apply(null, args);
   };
 
-  this.push = function (val) {
+  this.push = function (val,doDrain) {
     if (this._queue.length+1 > this.maxsize) {
 
       var maybe_regret = this._queue.pop(); // end of the array is the oldest data
@@ -49,8 +49,16 @@ var RueQueue = function (params) {
     }
 
     this._queue.unshift(val);
-    this.emit('drain');
+
+    // if they don't specify anything assume 'drain'
+    if (typeof doDrain === 'undefined') {
+      this.emit('drain');
+    }
   };
+
+  this.pushNoDrain = function(val) {
+    this.push(val,false);
+  }
 
   this.on('error', function() {
     this.resetDrainRetryTimer();
