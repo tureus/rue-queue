@@ -21,7 +21,6 @@ var RueQueue = function (params) {
   this.name = params.name;
   this._queue = [];
   this.maxsize = params.maxsize;
-  // this._regrets = 0;
   this.callback = params.callback;
   this.retryWait = params.retryWait || 5000;
   this.verbose = params.verbose || false;
@@ -33,18 +32,18 @@ var RueQueue = function (params) {
     }
     args.unshift("RueQueue(" + this.name + ")");
     console.log.apply(null, args);
-  }
+  };
 
   this.push = function (val) {
     if (this._queue.length+1 > this.maxsize) {
 
       var maybe_regret = this._queue.pop(); // end of the array is the oldest data
-      if (typeof maybe_regret._regret !== 'undefined') {
+      if (typeof maybe_regret._regrets !== 'undefined') {
         this._queue.pop(); // get rid of the oldest data
-        maybe_regret._regret += 1;
+        maybe_regret._regrets += 1;
         this._queue.push(maybe_regret);
       } else {
-        this._queue.push({_regret: 1});
+        this._queue.push({_regrets: 1});
       }
 
     }
