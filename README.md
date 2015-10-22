@@ -26,4 +26,7 @@ rq.push({my: "datum", is: "cool"});
 
 // stdout will print:
 // going to drain: {my: "datum", is: "cool"}
+
+// But if the queue starts to overflow you will get a special datum:
+// {_regrets: 15}
 ```
